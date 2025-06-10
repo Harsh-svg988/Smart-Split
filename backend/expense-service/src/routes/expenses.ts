@@ -1,20 +1,21 @@
 import express from 'express';
 import { Expense } from '../models/Expense';
 import { auth } from '../middleware/auth';
+import logger from '../utils/logger';
 
 const router = express.Router();
 
-// Get all expenses for a user
 router.get('/', auth, async (req, res) => {
   try {
     const expenses = await Expense.find({ userId: req.user?.userId });
+    logger.info(`Fetched ${expenses.length} expenses for user ${req.user?.userId}`);
     res.json(expenses);
   } catch (error) {
+    logger.error('Error fetching expenses', error);
     res.status(500).json({ message: 'Error fetching expenses', error });
   }
 });
 
-// Create a new expense
 router.post('/', auth, async (req, res) => {
   try {
     const { amount, description, category, date } = req.body;
@@ -26,13 +27,14 @@ router.post('/', auth, async (req, res) => {
       date: date || new Date()
     });
     await expense.save();
+    logger.info(`Created expense for user ${req.user?.userId}: ${expense._id}`);
     res.status(201).json(expense);
   } catch (error) {
+    logger.error('Error creating expense', error);
     res.status(500).json({ message: 'Error creating expense', error });
   }
 });
 
-// Update an expense
 router.put('/:id', auth, async (req, res) => {
   try {
     const { amount, description, category, date } = req.body;
@@ -41,17 +43,18 @@ router.put('/:id', auth, async (req, res) => {
       { amount, description, category, date },
       { new: true }
     );
-    console.log(expense);
     if (!expense) {
+      logger.warn(`Expense not found: ${req.params.id}`);
       return res.status(404).json({ message: 'Expense not found' });
     }
+    logger.info(`Updated expense ${expense._id} for user ${req.user?.userId}`);
     res.json(expense);
   } catch (error) {
+    logger.error('Error updating expense', error);
     res.status(500).json({ message: 'Error updating expense', error });
   }
 });
 
-// Delete an expense
 router.delete('/:id', auth, async (req, res) => {
   try {
     const expense = await Expense.findOneAndDelete({
@@ -59,12 +62,15 @@ router.delete('/:id', auth, async (req, res) => {
       userId: req.user?.userId
     });
     if (!expense) {
+      logger.warn(`Expense not found to delete: ${req.params.id}`);
       return res.status(404).json({ message: 'Expense not found' });
     }
+    logger.info(`Deleted expense ${req.params.id} for user ${req.user?.userId}`);
     res.json({ message: 'Expense deleted successfully' });
   } catch (error) {
+    logger.error('Error deleting expense', error);
     res.status(500).json({ message: 'Error deleting expense', error });
   }
 });
 
-export default router; 
+export default router;
