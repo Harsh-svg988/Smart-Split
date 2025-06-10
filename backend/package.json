@@ -1,0 +1,19 @@
+{
+  "name": "smartsplit-backend",
+  "version": "1.0.0",
+  "description": "Backend services for SmartSplit",
+  "scripts": {
+    "start": "concurrently \"npm run start:auth\" \"npm run start:expense\" \"npm run start:report\"",
+    "start:auth": "cd auth-service && npm run start",
+    "start:expense": "cd expense-service && npm run start",
+    "start:report": "cd report-service && npm run start",
+    "dev": "concurrently \"npm run dev:auth\" \"npm run dev:expense\" \"npm run dev:report\"",
+    "dev:auth": "cd auth-service && npm run dev",
+    "dev:expense": "cd expense-service && npm run dev",
+    "dev:report": "cd report-service && npm run dev",
+    "install:all": "npm install && cd auth-service && npm install && cd ../expense-service && npm install && cd ../report-service && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
+}
