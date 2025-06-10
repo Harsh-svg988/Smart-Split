@@ -59,10 +59,5 @@ MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
 ```
 
-## API Documentation
 
-API documentation will be available at `/api-docs` when the server is running.
 
-## License
-
-MIT 
