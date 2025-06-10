@@ -15,13 +15,9 @@ const logger = winston.createLogger({
   ],
 });
 
-// Stream for morgan HTTP logger
-interface LoggerStream {
-  write: (message: string) => void;
-}
-
-logger.stream = {
+// Add stream property to logger
+(logger as any).stream = {
   write: (message: string) => logger.info(message.trim())
-} as LoggerStream;
+};
 
 export default logger;
