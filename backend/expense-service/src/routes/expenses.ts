@@ -1,11 +1,17 @@
-import express from 'express';
+import express, { Request } from 'express';
 import { Expense } from '../models/Expense';
 import { auth } from '../middleware/auth';
 import logger from '../utils/logger';
 
+interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+  };
+}
+
 const router = express.Router();
 
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, async (req: AuthRequest, res) => {
   try {
     const expenses = await Expense.find({ userId: req.user?.userId });
     logger.info(`Fetched ${expenses.length} expenses for user ${req.user?.userId}`);
@@ -16,7 +22,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, async (req: AuthRequest, res) => {
   try {
     const { amount, description, category, date } = req.body;
     const expense = new Expense({
@@ -35,7 +41,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, async (req: AuthRequest, res) => {
   try {
     const { amount, description, category, date } = req.body;
     const expense = await Expense.findOneAndUpdate(
@@ -55,7 +61,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, async (req: AuthRequest, res) => {
   try {
     const expense = await Expense.findOneAndDelete({
       _id: req.params.id,
